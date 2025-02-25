@@ -50,29 +50,45 @@ function gsp_create_form() {
 
 // DuckDuckGo araması yapma fonksiyonu
 function gsp_search_duckduckgo($product_name) {
-    $url = 'https://api.duckduckgo.com/?q=' . urlencode($product_name) . '&format=json';
-    echo '<p>API URL: ' . esc_url($url) . '</p>';
+    $url = "https://www.searchapi.io/api/v1/search";
+    $params = array(
+        "engine" => "duckduckgo",
+        "q" => $product_name
+    );
+    $queryString = http_build_query($params);
 
-    $response = wp_remote_get($url);
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $url . '?' . $queryString,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 60,
+        CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_HTTPHEADER => [
+            "accept: application/json"
+        ]
+    ]);
 
-    if (is_wp_error($response)) {
-        echo '<p>Bir hata oluştu: ' . $response->get_error_message() . '</p>';
-        return;
-    }
+    $response = curl_exec($curl);
+    $error = curl_error($curl);
 
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
+    curl_close($curl);
 
-    if (isset($data['RelatedTopics']) && !empty($data['RelatedTopics'])) {
-        echo '<h2>Arama Sonuçları:</h2><ul>';
-        foreach ($data['RelatedTopics'] as $item) {
-            if (isset($item['FirstURL']) && isset($item['Text'])) {
-                echo '<li><a href="' . esc_url($item['FirstURL']) . '" target="_blank">' . esc_html($item['Text']) . '</a></li>';
-            }
-        }
-        echo '</ul>';
+    if ($error) {
+        echo "cURL Error #:" . $error;
     } else {
-        echo '<p>Arama sonuçları bulunamadı.</p>';
+        $data = json_decode($response, true);
+
+        if (isset($data['results']) && !empty($data['results'])) {
+            echo '<h2>Arama Sonuçları:</h2><ul>';
+            foreach ($data['results'] as $item) {
+                if (isset($item['url']) && isset($item['title'])) {
+                    echo '<li><a href="' . esc_url($item['url']) . '" target="_blank">' . esc_html($item['title']) . '</a></li>';
+                }
+            }
+            echo '</ul>';
+        } else {
+            echo '<p>Arama sonuçları bulunamadı.</p>';
+        }
     }
 }
 
