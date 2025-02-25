@@ -25,21 +25,29 @@ function gsp_create_form() {
 
 // Google araması yapma fonksiyonu
 function gsp_search_google($product_name) {
-    // Google arama API veya scraping yöntemi kullanılacak
-    // Bu kısımda Google araması yapılıp sonuçlar alınacak
-    // Örnek amaçlı statik sonuçlar gösteriliyor
-    $results = [
-        'https://example.com/result1',
-        'https://example.com/result2',
-        'https://example.com/result3',
-        // Diğer sonuçlar...
-    ];
-    
-    echo '<h2>Arama Sonuçları:</h2><ul>';
-    foreach ($results as $result) {
-        echo '<li><a href="' . esc_url($result) . '" target="_blank">' . esc_html($result) . '</a></li>';
+    $api_key = 'YOUR_GOOGLE_API_KEY'; // Buraya Google API anahtarınızı girin
+    $search_engine_id = 'YOUR_SEARCH_ENGINE_ID'; // Buraya Custom Search Engine ID'nizi girin
+    $url = 'https://www.googleapis.com/customsearch/v1?key=' . $api_key . '&cx=' . $search_engine_id . '&q=' . urlencode($product_name);
+
+    $response = wp_remote_get($url);
+
+    if (is_wp_error($response)) {
+        echo 'Bir hata oluştu: ' . $response->get_error_message();
+        return;
     }
-    echo '</ul>';
+
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
+
+    if (isset($data['items'])) {
+        echo '<h2>Arama Sonuçları:</h2><ul>';
+        foreach ($data['items'] as $item) {
+            echo '<li><a href="' . esc_url($item['link']) . '" target="_blank">' . esc_html($item['title']) . '</a></li>';
+        }
+        echo '</ul>';
+    } else {
+        echo 'Arama sonuçları bulunamadı.';
+    }
 }
 
 // Kısa kod ekleme
