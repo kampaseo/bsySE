@@ -43,6 +43,7 @@ function gsp_create_form() {
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['product_name'])) {
         $product_name = sanitize_text_field($_POST['product_name']);
+        echo '<p>Aranan Ürün: ' . esc_html($product_name) . '</p>';
         gsp_search_duckduckgo($product_name);
     }
 }
@@ -50,16 +51,21 @@ function gsp_create_form() {
 // DuckDuckGo araması yapma fonksiyonu
 function gsp_search_duckduckgo($product_name) {
     $url = 'https://api.duckduckgo.com/?q=' . urlencode($product_name) . '&format=json';
+    echo '<p>API URL: ' . esc_url($url) . '</p>';
 
     $response = wp_remote_get($url);
 
     if (is_wp_error($response)) {
-        echo 'Bir hata oluştu: ' . $response->get_error_message();
+        echo '<p>Bir hata oluştu: ' . $response->get_error_message() . '</p>';
         return;
     }
 
     $body = wp_remote_retrieve_body($response);
     $data = json_decode($body, true);
+
+    echo '<pre>';
+    print_r($data);
+    echo '</pre>';
 
     if (isset($data['RelatedTopics'])) {
         echo '<h2>Arama Sonuçları:</h2><ul>';
@@ -70,7 +76,7 @@ function gsp_search_duckduckgo($product_name) {
         }
         echo '</ul>';
     } else {
-        echo 'Arama sonuçları bulunamadı.';
+        echo '<p>Arama sonuçları bulunamadı.</p>';
     }
 }
 
