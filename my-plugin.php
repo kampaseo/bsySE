@@ -37,7 +37,7 @@ function gsp_display_admin_page() {
 function gsp_create_form() {
     echo '<form method="post" action="">
         <label for="product_name">Ürün İsmi:</label>
-        <input type="text" id="product_name" name="product_name">
+        <input type="text" id="product_name" name="product_name" required>
         <input type="submit" value="Ara">
     </form>';
 
@@ -62,10 +62,6 @@ function gsp_search_duckduckgo($product_name) {
 
     $body = wp_remote_retrieve_body($response);
     $data = json_decode($body, true);
-
-    echo '<pre>';
-    print_r($data);
-    echo '</pre>';
 
     if (isset($data['RelatedTopics']) && !empty($data['RelatedTopics'])) {
         echo '<h2>Arama Sonuçları:</h2><ul>';
