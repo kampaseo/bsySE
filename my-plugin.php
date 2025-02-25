@@ -4,7 +4,7 @@ Plugin Name: Google Search Plugin
 Plugin URI: https://example.com/google-search-plugin
 Description: Girilen ürün ismini DuckDuckGo'da arayıp, ilk 10 siteyi gösteren WordPress eklentisi.
 Version: 1.0
-Author: Your Name
+Author: SoS
 Author URI: https://example.com
 License: GPL2
 */
@@ -67,7 +67,7 @@ function gsp_search_duckduckgo($product_name) {
     print_r($data);
     echo '</pre>';
 
-    if (isset($data['RelatedTopics'])) {
+    if (isset($data['RelatedTopics']) && !empty($data['RelatedTopics'])) {
         echo '<h2>Arama Sonuçları:</h2><ul>';
         foreach ($data['RelatedTopics'] as $item) {
             if (isset($item['FirstURL']) && isset($item['Text'])) {
