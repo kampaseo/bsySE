@@ -9,6 +9,30 @@ Author URI: https://example.com
 License: GPL2
 */
 
+// Admin menüsüne sayfa ekleme
+function gsp_add_admin_menu() {
+    add_menu_page(
+        'Google Search Plugin',        // Sayfa başlığı
+        'Google Search',               // Menü başlığı
+        'manage_options',              // Yetki
+        'google-search-plugin',        // Menü slug
+        'gsp_display_admin_page',      // Gösterilecek fonksiyon
+        'dashicons-search',            // Menü simgesi
+        6                              // Menü pozisyonu
+    );
+}
+add_action('admin_menu', 'gsp_add_admin_menu');
+
+// Admin sayfasını gösterme fonksiyonu
+function gsp_display_admin_page() {
+    ?>
+    <div class="wrap">
+        <h1>Google Search Plugin</h1>
+        <?php gsp_create_form(); ?>
+    </div>
+    <?php
+}
+
 // Formu oluşturma ve işleme
 function gsp_create_form() {
     echo '<form method="post" action="">
